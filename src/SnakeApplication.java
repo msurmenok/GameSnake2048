@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 public class SnakeApplication extends JFrame{
     Timer timer = new Timer(1000, new TimerListener());
+
     Image background = (new ImageIcon("images/bg.png")).getImage();
     Image snakeRightFace= (new ImageIcon("images/rightFace.png")).getImage();
     Image snakeLeftFace= (new ImageIcon("images/leftFace.png")).getImage();
@@ -15,8 +16,11 @@ public class SnakeApplication extends JFrame{
     Image snakeDownFace= (new ImageIcon("images/downFace.png")).getImage();
     Image snakeHead = snakeRightFace;
     Image snakeBody = (new ImageIcon("images/snakeBody.png")).getImage();
-    char direction = 'r';
+    Image goodFood = (new ImageIcon("images/food.png")).getImage();
+    Image badFood = (new ImageIcon("images/poison.png")).getImage();
 
+    boolean isDie = false;
+    char direction = 'r';
     ArrayList<Snake> snake;
 
     public SnakeApplication() {
@@ -38,6 +42,7 @@ public class SnakeApplication extends JFrame{
         game.setVisible(true);
     }
 
+//    Move all parts of snake
     void moving() {
         int x_previous = snake.get(0).x;
         int y_previous = snake.get(0).y;
@@ -60,8 +65,6 @@ public class SnakeApplication extends JFrame{
             x_previous = x_temp;
             y_previous = y_temp;
         }
-
-
     }
 
     void turnLeft() {
@@ -80,6 +83,7 @@ public class SnakeApplication extends JFrame{
         (snake.get(0)).y += 100;
     }
 
+//   check and change direction
     void setDirection(char ch) {
         if ((ch == 'l' && direction == 'r') ||
             (ch == 'r' && direction == 'l') ||
@@ -91,6 +95,7 @@ public class SnakeApplication extends JFrame{
         turnSnakeHead();
     }
 
+// turn head-image
     void turnSnakeHead() {
         switch (direction) {
             case 'l': snakeHead = snakeLeftFace; break;
@@ -100,7 +105,24 @@ public class SnakeApplication extends JFrame{
         }
     }
 
+//    generate random coordinates for food
+    int[] generateRandomCoordinates() {
+        int x = (int)(Math.random() * 6) * 100;
+        int y = (int)(Math.random() * 8) * 100;
+        return new int[]{x, y};
+    }
 
+//    check similar coordinates with startingIndex 0 (for food) or 1 (for isDie())
+    boolean isSamePlace(int xParam, int yParam, int startingIndex) {
+        for (int i = startingIndex; i < snake.size(); i++) {
+            if (snake.get(i).x == xParam && snake.get(i).y == yParam) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+//  constructor, handle from keyboard
      class DrawingSnake extends JPanel {
 
          DrawingSnake() {
@@ -120,6 +142,7 @@ public class SnakeApplication extends JFrame{
 
          }
 
+//         Draw everything here
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
@@ -129,17 +152,23 @@ public class SnakeApplication extends JFrame{
             this.setFocusable(true);
 
             moving();
-            g.setFont(new Font("Tahoma", Font.BOLD , 30));
 
-            g.drawImage(snakeHead, (snake.get(0)).x, (snake.get(0)).y, this);
-            for (int i = 1; i < snake.size(); i++) {
-                g.drawImage(snakeBody, (snake.get(i)).x, (snake.get(i)).y, this);
-                g.drawString(("" +(snake.get(i).value)), snake.get(i).x + 30, snake.get(i).y + 50);
+            if (!(snake.get(0).x == 600 || snake.get(0).x == -100 ||snake.get(0).y == 800 || snake.get(0).y == -100 )){
+                g.setFont(new Font("Tahoma", Font.BOLD, 30));
+                g.drawImage(snakeHead, (snake.get(0)).x, (snake.get(0)).y, this);
+                for (int i = 1; i < snake.size(); i++) {
+                    g.drawImage(snakeBody, (snake.get(i)).x, (snake.get(i)).y, this);
+                    g.drawString(("" + (snake.get(i).value)), snake.get(i).x + 30, snake.get(i).y + 50);
+                }
+            }
+            else {
+                timer.stop();
             }
 
         }
     }
 
+//    just timer
     class TimerListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent arg0) {
