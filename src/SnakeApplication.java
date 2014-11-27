@@ -22,14 +22,24 @@ public class SnakeApplication extends JFrame{
     boolean isDie = false;
     char direction = 'r';
     ArrayList<Snake> snake;
+    ArrayList<Food> food;
+    int stepsCount = 0;
 
     public SnakeApplication() {
         snake = new ArrayList<Snake>();
         snake.add(new Snake());
         snake.add(new Snake(0, 500, 2));
-        snake.add(new Snake(0, 600, 2));
+        snake.add(new Snake(0, 600, 4));
+        snake.add(new Snake(0, 600, 8));
+        snake.add(new Snake(0, 600, 16));
+
+        try {
+            food.add(new Food(500, 700, 1, true));
+        } catch (Exception e) {
+            System.out.println(e.toString());
+        }
+
         DrawingSnake panel = new DrawingSnake();
-//        panel.setFocusable(true);
         add(new DrawingSnake());
     }
 
@@ -65,6 +75,8 @@ public class SnakeApplication extends JFrame{
             x_previous = x_temp;
             y_previous = y_temp;
         }
+//          it works :)
+//        stepsCount++;
     }
 
     void turnLeft() {
@@ -112,7 +124,18 @@ public class SnakeApplication extends JFrame{
         return new int[]{x, y};
     }
 
-//    check similar coordinates with startingIndex 0 (for food) or 1 (for isDie())
+//    add food in board
+//    void addFood() {
+//        int[] xy = generateRandomCoordinates();
+//        int value = (int)(Math.pow(2, (int)(Math.random() * 10)));
+//        if (!isSamePlace(xy[0], xy[1], 0)) {
+//           food.add(new Food(xy[0], xy[1], value, snake.get(snake.size() - 1).value > value));
+//        }
+//        else {
+//            addFood();
+//        }
+//    }
+//    check similar coordinates with startingIndex 0 (for food) or 1 (for Die())
     boolean isSamePlace(int xParam, int yParam, int startingIndex) {
         for (int i = startingIndex; i < snake.size(); i++) {
             if (snake.get(i).x == xParam && snake.get(i).y == yParam) {
@@ -152,18 +175,31 @@ public class SnakeApplication extends JFrame{
             this.setFocusable(true);
 
             moving();
-
+            g.drawImage(goodFood, 500, 700, this);
             if (!(snake.get(0).x == 600 || snake.get(0).x == -100 ||snake.get(0).y == 800 || snake.get(0).y == -100 )){
                 g.setFont(new Font("Tahoma", Font.BOLD, 30));
                 g.drawImage(snakeHead, (snake.get(0)).x, (snake.get(0)).y, this);
                 for (int i = 1; i < snake.size(); i++) {
                     g.drawImage(snakeBody, (snake.get(i)).x, (snake.get(i)).y, this);
-                    g.drawString(("" + (snake.get(i).value)), snake.get(i).x + 30, snake.get(i).y + 50);
+                    g.drawString(("" + (snake.get(i).value) + stepsCount), snake.get(i).x + 30, snake.get(i).y + 50);
                 }
             }
             else {
                 timer.stop();
             }
+
+
+//            if (food.size() > 0) {
+//                for (int i = 0; i < food.size(); i++) {
+//                    Image image = badFood;
+//                    if (food.get(i).isGood ) {
+//                        image = goodFood;
+//                    }
+//                    g.drawImage(image, food.get(i).x, food.get(i).y, this);
+////                    g.drawString(("" + (food.get(i).value)), food.get(i).x + 30, food.get(i).y + 50);
+//                }
+//            }
+
 
         }
     }
