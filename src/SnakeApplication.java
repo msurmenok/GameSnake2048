@@ -4,10 +4,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class SnakeApplication extends JFrame{
-    Timer timer = new Timer(1000, new TimerListener());
+    Timer timer = new Timer(500, new TimerListener());
 
     Image background = (new ImageIcon("images/bg.png")).getImage();
     Image snakeRightFace= (new ImageIcon("images/rightFace.png")).getImage();
@@ -42,11 +47,34 @@ public class SnakeApplication extends JFrame{
         game.setVisible(true);
     }
 
+//    Search and add similar value inside snake
+    void compactSnake() {
+        for (int i = 1; i < snake.size() - 1; i++) {
+            if (snake.get(i).value == snake.get(i + 1).value) {
+                snake.get(i).value += snake.get(i + 1).value;
+                int x = snake.get(i + 1).x;
+                int y = snake.get(i + 1).y;
+                snake.remove(i + 1);
+                for (int j = i + 1; j < snake.size(); j++) {
+                    int x_temp = snake.get(j).x;
+                    int y_temp = snake.get(j).y;
+                    snake.get(j).x = x;
+                    snake.get(j).y = y;
+                    x = x_temp;
+                    y = y_temp;
+                }
+            }
+        }
+    }
+
 //    Move all parts of snake
     void moving() {
         int x_previous = snake.get(0).x;
         int y_previous = snake.get(0).y;
 
+        traceGame("" + stepsCount + "step before compact");
+        compactSnake();
+        traceGame("" + stepsCount + "after before compact");
 
         oldSnake.clear();
 //        clone snake to oldSnake
@@ -83,9 +111,9 @@ public class SnakeApplication extends JFrame{
             addFood();
         }
         if (stepsCount % 30 == 0 && stepsCount != 0) {
-            deleteFood();
+            food.remove(0);
         }
-
+        traceGame("" + stepsCount + " end moving");
         stepsCount++;
     }
 
@@ -141,9 +169,9 @@ public class SnakeApplication extends JFrame{
         double maxPower = Math.log(lastElementValue) / Math.log(2) + 5;
         int power = (int) (Math.random() * maxPower);
 
-        System.out.println("Last element: " + lastElementValue);
-        System.out.println("max power: " + maxPower);
-        System.out.println("power: " + power);
+//        out.println("Last element: " + lastElementValue);
+//        System.out.println("max power: " + maxPower);
+//        System.out.println("power: " + power);
 
         int value = (int)(Math.pow(2, power));
         if (!isSamePlaceSnake(xy[0], xy[1], 0) && !isSamePlaceFood(xy[0], xy[1])) {
@@ -179,9 +207,7 @@ public class SnakeApplication extends JFrame{
         }
     }
 
-    void deleteFood() {
-        food.remove(0);
-    }
+
 
     void eatFood() {
         for (int i = 0; i < food.size(); i++) {
@@ -216,6 +242,9 @@ public class SnakeApplication extends JFrame{
                 }
                 food.remove(i);
             }
+            else if (snake.get(0).x == food.get(i).x && snake.get(0).y == food.get(i).y && !food.get(i).isGood) {
+                timer.stop();
+            }
         }
     }
 //    check similar coordinates with startingIndex 0 (for add food) or 1 (for Die())
@@ -236,6 +265,37 @@ public class SnakeApplication extends JFrame{
             }
         }
         return false;
+    }
+
+    void traceGame(String message) {
+
+        PrintWriter out = null;
+        try {
+            out = new PrintWriter(new BufferedWriter(new FileWriter("e:\\COM\\FALL2014\\COMP135\\Final Project\\GameSnake2048\\logs\\log.txt", true)));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        String[][] matrix = new String[8][6];
+
+        for (int i = 0; i < snake.size(); i++) {
+            matrix[snake.get(i).y / 100][snake.get(i).x/ 100] = "[" + snake.get(i).value + "]";
+        }
+
+        for (int i = 0; i < food.size(); i++) {
+            matrix[food.get(i).y / 100][food.get(i).x / 100] = "" + food.get(i).value;
+        }
+
+        out.println(message);
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < matrix[i].length; j++) {
+                out.printf("%5s", matrix[i][j]);
+            }
+            out.println();
+        }
+        out.println("\n\n\n");
+        out.flush();
+        out.close();
     }
 
 //  constructor, handle from keyboard
@@ -268,6 +328,7 @@ public class SnakeApplication extends JFrame{
             this.setFocusable(true);
 
             moving();
+            checkFood();
             if (!(snake.get(0).x == 600 || snake.get(0).x == -100 ||snake.get(0).y == 800 || snake.get(0).y == -100 )){
                 g.setFont(new Font("Tahoma", Font.BOLD, 30));
                 g.drawImage(snakeHead, (snake.get(0)).x, (snake.get(0)).y, this);
@@ -279,8 +340,6 @@ public class SnakeApplication extends JFrame{
             else {
                 timer.stop();
             }
-
-            checkFood();
             if (food.size() > 0) {
                 for (int i = 0; i < food.size(); i++) {
                     Image image = badFood;
@@ -291,15 +350,6 @@ public class SnakeApplication extends JFrame{
                     g.drawString(("" + (food.get(i).value)), food.get(i).x + 30, food.get(i).y + 50);
                 }
             }
-
-//            print oldSnake
-//            System.out.println(stepsCount + " iteration");
-//            for (Object s : oldSnake ) {
-//                System.out.print(s.toString() + " ");
-//            }
-
-
-
         }
     }
 
