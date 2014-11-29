@@ -39,3 +39,4 @@ Icon
 .metadata/
 .idea/
 bin/
+*.class

@@ -4,10 +4,10 @@
 public class Snake {
     public int x = 0;
     public int y = 400;
-    public int value = 0;
+    public long value = 0;
 
     Snake() {}
-    Snake(int x, int y, int value) {
+    Snake(int x, int y, long value) {
         this.x = x;
         this.y = y;
         this.value = value;

@@ -4,11 +4,11 @@
 public class Food {
     public int x;
     public int y;
-    public int value = 1;
+    public long value = 1;
     public boolean isGood = true;
 
     Food(){}
-    Food(int x, int y, int value, boolean isGood) {
+    Food(int x, int y, long value, boolean isGood) {
         this.x = x;
         this.y = y;
         this.value = value;

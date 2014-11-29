@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class SnakeApplication extends JFrame{
-    Timer timer = new Timer(500, new TimerListener());
+    Timer timer = new Timer(700, new TimerListener());
 
     Image background = (new ImageIcon("images/bg.png")).getImage();
     Image snakeRightFace= (new ImageIcon("images/rightFace.png")).getImage();
@@ -72,9 +72,9 @@ public class SnakeApplication extends JFrame{
         int x_previous = snake.get(0).x;
         int y_previous = snake.get(0).y;
 
-        traceGame("" + stepsCount + "step before compact");
+//        traceGame("" + stepsCount + "step before compact");
         compactSnake();
-        traceGame("" + stepsCount + "after before compact");
+//        traceGame("" + stepsCount + "after  compact");
 
         oldSnake.clear();
 //        clone snake to oldSnake
@@ -113,7 +113,7 @@ public class SnakeApplication extends JFrame{
         if (stepsCount % 30 == 0 && stepsCount != 0) {
             food.remove(0);
         }
-        traceGame("" + stepsCount + " end moving");
+//        traceGame("" + stepsCount + " end moving");
         stepsCount++;
     }
 
@@ -165,7 +165,7 @@ public class SnakeApplication extends JFrame{
 //    add food in board
     void addFood() {
         int[] xy = generateRandomCoordinates();
-        int lastElementValue = snake.get(snake.size() - 1).value == 0 ? 1 : snake.get(snake.size() - 1).value;
+        long lastElementValue = snake.get(snake.size() - 1).value == 0 ? 1 : snake.get(snake.size() - 1).value;
         double maxPower = Math.log(lastElementValue) / Math.log(2) + 5;
         int power = (int) (Math.random() * maxPower);
 
@@ -173,7 +173,7 @@ public class SnakeApplication extends JFrame{
 //        System.out.println("max power: " + maxPower);
 //        System.out.println("power: " + power);
 
-        int value = (int)(Math.pow(2, power));
+        long value = (long)(Math.pow(2, power));
         if (!isSamePlaceSnake(xy[0], xy[1], 0) && !isSamePlaceFood(xy[0], xy[1])) {
            food.add(new Food(xy[0], xy[1], value, lastElementValue > value));
         }
@@ -182,7 +182,7 @@ public class SnakeApplication extends JFrame{
         }
     }
 
-    void addFood(int initialValue) {
+    void addFood(long initialValue) {
         int[] xy = generateRandomCoordinates();
         if (!isSamePlaceSnake(xy[0], xy[1], 0) && !isSamePlaceFood(xy[0], xy[1])) {
             food.add(new Food(xy[0], xy[1], initialValue, true));
@@ -267,36 +267,61 @@ public class SnakeApplication extends JFrame{
         return false;
     }
 
-    void traceGame(String message) {
-
-        PrintWriter out = null;
-        try {
-            out = new PrintWriter(new BufferedWriter(new FileWriter("e:\\COM\\FALL2014\\COMP135\\Final Project\\GameSnake2048\\logs\\log.txt", true)));
-        } catch (IOException e) {
-            e.printStackTrace();
+//    formatting value to String
+    String formatValue(long value) {
+        long kb = 1024L;
+        long mb = (long)Math.pow(1024, 2);
+        long gb = (long)Math.pow(1024, 3);
+        long tb = (long)Math.pow(1024, 4);
+        if (value <= 8192) {
+            return (long)value + "";
         }
-
-        String[][] matrix = new String[8][6];
-
-        for (int i = 0; i < snake.size(); i++) {
-            matrix[snake.get(i).y / 100][snake.get(i).x/ 100] = "[" + snake.get(i).value + "]";
+        else if (value > 8192 && value <= (8192 * kb)) {
+            return (long)(value / kb) + "K";
         }
-
-        for (int i = 0; i < food.size(); i++) {
-            matrix[food.get(i).y / 100][food.get(i).x / 100] = "" + food.get(i).value;
+        else if (value > (8192 * kb) && value <= (8192 * mb)) {
+            return (long)(value / mb) + "M";
         }
-
-        out.println(message);
-        for (int i = 0; i < matrix.length; i++) {
-            for (int j = 0; j < matrix[i].length; j++) {
-                out.printf("%5s", matrix[i][j]);
-            }
-            out.println();
+        else if (value > (8192 * mb) && value <= (8192 * gb)) {
+            return (long)(value / gb) + "G";
         }
-        out.println("\n\n\n");
-        out.flush();
-        out.close();
+        else {
+            return (long)(value / tb) + "T";
+        }
     }
+
+
+//      tracing
+//    void traceGame(String message) {
+//
+//        PrintWriter out = null;
+//        try {
+//            out = new PrintWriter(new BufferedWriter(new FileWriter("e:\\COM\\FALL2014\\COMP135\\Final Project\\GameSnake2048\\logs\\log.txt", true)));
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//
+//        String[][] matrix = new String[8][6];
+//
+//        for (int i = 0; i < snake.size(); i++) {
+//            matrix[snake.get(i).y / 100][snake.get(i).x/ 100] = "[" + snake.get(i).value + "]";
+//        }
+//
+//        for (int i = 0; i < food.size(); i++) {
+//            matrix[food.get(i).y / 100][food.get(i).x / 100] = "" + food.get(i).value;
+//        }
+//
+//        out.println(message);
+//        for (int i = 0; i < matrix.length; i++) {
+//            for (int j = 0; j < matrix[i].length; j++) {
+//                out.printf("%5s", matrix[i][j]);
+//            }
+//            out.println();
+//        }
+//        out.println("\n\n\n");
+//        out.flush();
+//        out.close();
+//    }
 
 //  constructor, handle from keyboard
      class DrawingSnake extends JPanel {
@@ -334,7 +359,7 @@ public class SnakeApplication extends JFrame{
                 g.drawImage(snakeHead, (snake.get(0)).x, (snake.get(0)).y, this);
                 for (int i = 1; i < snake.size(); i++) {
                     g.drawImage(snakeBody, (snake.get(i)).x, (snake.get(i)).y, this);
-                    g.drawString(("" + (snake.get(i).value)), snake.get(i).x + 30, snake.get(i).y + 50);
+                    g.drawString((formatValue(snake.get(i).value)), snake.get(i).x + 30, snake.get(i).y + 50);
                 }
             }
             else {
@@ -347,7 +372,7 @@ public class SnakeApplication extends JFrame{
                         image = goodFood;
                     }
                     g.drawImage(image, food.get(i).x, food.get(i).y, this);
-                    g.drawString(("" + (food.get(i).value)), food.get(i).x + 30, food.get(i).y + 50);
+                    g.drawString((formatValue(food.get(i).value)), food.get(i).x + 15, food.get(i).y + 60);
                 }
             }
         }
