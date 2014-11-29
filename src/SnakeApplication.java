@@ -30,6 +30,8 @@ public class SnakeApplication extends JFrame{
     ArrayList<Snake> oldSnake = new ArrayList<Snake>();
     ArrayList<Food> food = new ArrayList<Food>();
     int stepsCount = 0;
+    long score = 0;
+    int cellSize = 100;
 
     public SnakeApplication() {
         snake.add(new Snake());
@@ -92,6 +94,7 @@ public class SnakeApplication extends JFrame{
         }
         else {
             timer.stop();
+            System.out.println(score);
         }
 
         eatFood();
@@ -107,7 +110,7 @@ public class SnakeApplication extends JFrame{
         if (stepsCount == 0) {
             addFood(1);
         }
-        else if (stepsCount % 4 == 0 && stepsCount != 0) {
+        else if (stepsCount % 2 == 0 && stepsCount != 0) {
             addFood();
         }
         if (stepsCount % 30 == 0 && stepsCount != 0) {
@@ -118,19 +121,19 @@ public class SnakeApplication extends JFrame{
     }
 
     void turnLeft() {
-        (snake.get(0)).x -= 100;
+        (snake.get(0)).x -= cellSize;
     }
 
     void turnRight() {
-        (snake.get(0)).x += 100;
+        (snake.get(0)).x += cellSize;
     }
 
     void turnUp() {
-        (snake.get(0)).y -= 100;
+        (snake.get(0)).y -= cellSize;
     }
 
     void turnDown() {
-        (snake.get(0)).y += 100;
+        (snake.get(0)).y += cellSize;
     }
 
 //   check and change direction
@@ -157,28 +160,35 @@ public class SnakeApplication extends JFrame{
 
 //    generate random coordinates for food
     int[] generateRandomCoordinates() {
-        int x = (int)(Math.random() * 6) * 100;
-        int y = (int)(Math.random() * 8) * 100;
+        int x = (int)(Math.random() * 6) * cellSize;
+        int y = (int)(Math.random() * 8) * cellSize;
         return new int[]{x, y};
     }
 
 //    add food in board
     void addFood() {
-        int[] xy = generateRandomCoordinates();
+        boolean foodWasAdded = false;
         long lastElementValue = snake.get(snake.size() - 1).value == 0 ? 1 : snake.get(snake.size() - 1).value;
         double maxPower = Math.log(lastElementValue) / Math.log(2) + 5;
         int power = (int) (Math.random() * maxPower);
-
-//        out.println("Last element: " + lastElementValue);
-//        System.out.println("max power: " + maxPower);
-//        System.out.println("power: " + power);
-
         long value = (long)(Math.pow(2, power));
-        if (!isSamePlaceSnake(xy[0], xy[1], 0) && !isSamePlaceFood(xy[0], xy[1])) {
-           food.add(new Food(xy[0], xy[1], value, lastElementValue > value));
-        }
-        else {
-            addFood();
+        int x_prohibited = snake.get(0).x;
+        int y_prohibited = snake.get(0).y;
+
+        while(!foodWasAdded) {
+            int[] xy = generateRandomCoordinates();
+
+            if (!isSamePlaceSnake(xy[0], xy[1], 0) && !isSamePlaceFood(xy[0], xy[1])) {
+                if (snake.size() + food.size() < 40 &&
+                        (xy[0] == x_prohibited || xy[0] == x_prohibited - cellSize || xy[0] == x_prohibited + cellSize) &&
+                        (xy[1] == y_prohibited || xy[1] == y_prohibited - cellSize || xy[1] == y_prohibited + cellSize)){
+                    continue;
+                }
+                else {
+                    food.add(new Food(xy[0], xy[1], value, lastElementValue > value));
+                    foodWasAdded = true;
+                }
+            }
         }
     }
 
@@ -212,6 +222,7 @@ public class SnakeApplication extends JFrame{
     void eatFood() {
         for (int i = 0; i < food.size(); i++) {
             if (snake.get(0).x == food.get(i).x && snake.get(0).y == food.get(i).y && food.get(i).isGood) {
+                score += 1;
                 for (int j = (snake.size() - 1); j >= 0 ; j--) {
                     if (snake.get(j).value == food.get(i).value) {
                         snake.get(j).value += food.get(i).value;
@@ -241,8 +252,10 @@ public class SnakeApplication extends JFrame{
                     }
                 }
                 food.remove(i);
+
             }
             else if (snake.get(0).x == food.get(i).x && snake.get(0).y == food.get(i).y && !food.get(i).isGood) {
+                System.out.println(score);
                 timer.stop();
             }
         }
@@ -304,11 +317,11 @@ public class SnakeApplication extends JFrame{
 //        String[][] matrix = new String[8][6];
 //
 //        for (int i = 0; i < snake.size(); i++) {
-//            matrix[snake.get(i).y / 100][snake.get(i).x/ 100] = "[" + snake.get(i).value + "]";
+//            matrix[snake.get(i).y / cellSize][snake.get(i).x/ cellSize] = "[" + snake.get(i).value + "]";
 //        }
 //
 //        for (int i = 0; i < food.size(); i++) {
-//            matrix[food.get(i).y / 100][food.get(i).x / 100] = "" + food.get(i).value;
+//            matrix[food.get(i).y / cellSize][food.get(i).x / cellSize] = "" + food.get(i).value;
 //        }
 //
 //        out.println(message);
@@ -354,7 +367,8 @@ public class SnakeApplication extends JFrame{
 
             moving();
             checkFood();
-            if (!(snake.get(0).x == 600 || snake.get(0).x == -100 ||snake.get(0).y == 800 || snake.get(0).y == -100 )){
+
+            if (!(snake.get(0).x == 600 || snake.get(0).x == -cellSize ||snake.get(0).y == 800 || snake.get(0).y == -cellSize )){
                 g.setFont(new Font("Tahoma", Font.BOLD, 30));
                 g.drawImage(snakeHead, (snake.get(0)).x, (snake.get(0)).y, this);
                 for (int i = 1; i < snake.size(); i++) {
@@ -363,7 +377,9 @@ public class SnakeApplication extends JFrame{
                 }
             }
             else {
+                System.out.println(score);
                 timer.stop();
+
             }
             if (food.size() > 0) {
                 for (int i = 0; i < food.size(); i++) {
