@@ -13,6 +13,7 @@ import java.util.Arrays;
 
 public class SnakeApplication extends JFrame{
     Timer timer = new Timer(700, new TimerListener());
+    String gameStyle = "normal";
 
     Image background = (new ImageIcon("images/bg.png")).getImage();
     Image snakeRightFace= (new ImageIcon("images/rightFace.png")).getImage();
@@ -121,7 +122,8 @@ public class SnakeApplication extends JFrame{
 
     void turnLeft() {
         int foodIndex = searchingFoodByCoordinates(snake.get(0).x - cellSize, snake.get(0).y);
-        if (foodIndex != -1 && !food.get(foodIndex).isGood) {
+        int snakeIndex = searchingSnakeByCoordinates(snake.get(0).x - cellSize, snake.get(0).y);
+        if ((foodIndex != -1 && !food.get(foodIndex).isGood) || snakeIndex != -1) {
                 isDie = true;
         }
         else if ((snake.get(0)).x == 0 ) {
@@ -134,7 +136,8 @@ public class SnakeApplication extends JFrame{
 
     void turnRight() {
         int foodIndex = searchingFoodByCoordinates(snake.get(0).x + cellSize, snake.get(0).y);
-        if (foodIndex != -1 && !food.get(foodIndex).isGood) {
+        int snakeIndex = searchingSnakeByCoordinates(snake.get(0).x + cellSize, snake.get(0).y);
+        if ((foodIndex != -1 && !food.get(foodIndex).isGood) || snakeIndex != -1) {
             isDie = true;
         }
         else if ((snake.get(0)).x == 5 * cellSize) {
@@ -147,7 +150,8 @@ public class SnakeApplication extends JFrame{
 
     void turnUp() {
         int foodIndex = searchingFoodByCoordinates(snake.get(0).x, snake.get(0).y - cellSize);
-        if (foodIndex != -1 && !food.get(foodIndex).isGood) {
+        int snakeIndex = searchingSnakeByCoordinates(snake.get(0).x, snake.get(0).y - cellSize);
+        if ((foodIndex != -1 && !food.get(foodIndex).isGood) || snakeIndex != -1) {
             isDie = true;
 
         }
@@ -161,7 +165,8 @@ public class SnakeApplication extends JFrame{
 
     void turnDown() {
         int foodIndex = searchingFoodByCoordinates(snake.get(0).x, snake.get(0).y + cellSize);
-        if (foodIndex != -1 && !food.get(foodIndex).isGood) {
+        int snakeIndex = searchingSnakeByCoordinates(snake.get(0).x, snake.get(0).y + cellSize);
+        if ((foodIndex != -1 && !food.get(foodIndex).isGood) || snakeIndex != -1) {
             isDie = true;
         }
         else if ((snake.get(0)).y == 7 * cellSize) {
@@ -176,6 +181,20 @@ public class SnakeApplication extends JFrame{
        int index = -1;
         for (int i = 0; i < food.size(); i++) {
             if (food.get(i).x == element_x && food.get(i).y == element_y) {
+                index = i;
+                break;
+            }
+        }
+        return index;
+    }
+
+    int searchingSnakeByCoordinates(int element_x, int element_y) {
+        int index = -1;
+        if (gameStyle.equals("burrow")) {
+            return index;
+        }
+        for (int i = 1; i < snake.size(); i++) {
+            if (snake.get(i).x == element_x && snake.get(i).y == element_y) {
                 index = i;
                 break;
             }
