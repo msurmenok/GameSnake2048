@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class SnakeApplication extends JFrame{
-    Timer timer = new Timer(700, new TimerListener());
+    Timer timer = new Timer(600, new TimerListener());
     String gameStyle = "normal";
 
     Image background = (new ImageIcon("images/bg.png")).getImage();
@@ -20,10 +20,16 @@ public class SnakeApplication extends JFrame{
     Image snakeLeftFace= (new ImageIcon("images/leftFace.png")).getImage();
     Image snakeUpFace= (new ImageIcon("images/upFace.png")).getImage();
     Image snakeDownFace= (new ImageIcon("images/downFace.png")).getImage();
+    Image snakeRightFaceDeath= (new ImageIcon("images/rightFaceDeath.png")).getImage();
+    Image snakeLeftFaceDeath= (new ImageIcon("images/leftFaceDeath.png")).getImage();
+    Image snakeUpFaceDeath= (new ImageIcon("images/upFaceDeath.png")).getImage();
+    Image snakeDownFaceDeath= (new ImageIcon("images/downFaceDeath.png")).getImage();
     Image snakeHead = snakeRightFace;
     Image snakeBody = (new ImageIcon("images/snakeBody.png")).getImage();
     Image goodFood = (new ImageIcon("images/food.png")).getImage();
     Image badFood = (new ImageIcon("images/poison.png")).getImage();
+
+    Image gameOverBG = (new ImageIcon("images/gameOverBG.png")).getImage();
 
     boolean isDie = false;
     char direction = 'r';
@@ -34,18 +40,41 @@ public class SnakeApplication extends JFrame{
     long score = 0;
     int cellSize = 100;
 
+    JButton jbtNewGame = new JButton("NEW GAME");
+    JLabel jlbScore = new JLabel("score: ");
+    JTextField jtfScore = new JTextField(10);
+
 
     public SnakeApplication() {
         snake.add(new Snake());
 
         DrawingSnake panel = new DrawingSnake();
-        add(new DrawingSnake());
+        setLayout(new BorderLayout(10, 10));
+        add(new DrawingSnake(), BorderLayout.CENTER);
+
+        JPanel rightSidePanel = new JPanel(new GridLayout(10, 1));
+        rightSidePanel.add(jbtNewGame);
+        rightSidePanel.add(jlbScore);
+        rightSidePanel.add(jtfScore);
+        add(rightSidePanel, BorderLayout.EAST);
+
+        Font myFont = new Font("Tahoma", Font.BOLD, 24);
+        jbtNewGame.setFont(myFont);
+        jlbScore.setFont(myFont);
+        jtfScore.setFont(myFont);
+
+        jbtNewGame.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
     }
 
 
     public static void main(String[] args) {
         JFrame game = new SnakeApplication();
-        game.setSize(616, 839);
+        game.setSize(870, 839);
         game.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         game.setLocationRelativeTo(null);
         game.setVisible(true);
@@ -110,7 +139,10 @@ public class SnakeApplication extends JFrame{
         if (stepsCount == 0) {
             addFood(1);
         }
-        else if (stepsCount % 3 == 0 && stepsCount != 0) {
+        else if (stepsCount % 2 == 0 && stepsCount != 0 && food.size() <= 15) {
+            addFood();
+        }
+        else if (stepsCount % 4 == 0 && stepsCount != 0 && food.size() > 15) {
             addFood();
         }
         if (stepsCount % 30 == 0 && stepsCount != 0) {
@@ -123,11 +155,13 @@ public class SnakeApplication extends JFrame{
     void turnLeft() {
         int foodIndex = searchingFoodByCoordinates(snake.get(0).x - cellSize, snake.get(0).y);
         int snakeIndex = searchingSnakeByCoordinates(snake.get(0).x - cellSize, snake.get(0).y);
-        if ((foodIndex != -1 && !food.get(foodIndex).isGood) || snakeIndex != -1) {
+        if ((foodIndex != -1 && !food.get(foodIndex).isGood) || (snakeIndex != -1 && snakeIndex != snake.size() - 1)) {
                 isDie = true;
+                snakeHead = snakeLeftFaceDeath;
         }
         else if ((snake.get(0)).x == 0 ) {
             isDie = true;
+            snakeHead = snakeLeftFaceDeath;
         }
         else {
             (snake.get(0)).x -= cellSize;
@@ -137,11 +171,13 @@ public class SnakeApplication extends JFrame{
     void turnRight() {
         int foodIndex = searchingFoodByCoordinates(snake.get(0).x + cellSize, snake.get(0).y);
         int snakeIndex = searchingSnakeByCoordinates(snake.get(0).x + cellSize, snake.get(0).y);
-        if ((foodIndex != -1 && !food.get(foodIndex).isGood) || snakeIndex != -1) {
+        if ((foodIndex != -1 && !food.get(foodIndex).isGood) || (snakeIndex != -1 && snakeIndex != snake.size() - 1)) {
             isDie = true;
+            snakeHead = snakeRightFaceDeath;
         }
         else if ((snake.get(0)).x == 5 * cellSize) {
             isDie = true;
+            snakeHead = snakeRightFaceDeath;
         }
         else {
             (snake.get(0)).x += cellSize;
@@ -151,12 +187,13 @@ public class SnakeApplication extends JFrame{
     void turnUp() {
         int foodIndex = searchingFoodByCoordinates(snake.get(0).x, snake.get(0).y - cellSize);
         int snakeIndex = searchingSnakeByCoordinates(snake.get(0).x, snake.get(0).y - cellSize);
-        if ((foodIndex != -1 && !food.get(foodIndex).isGood) || snakeIndex != -1) {
+        if ((foodIndex != -1 && !food.get(foodIndex).isGood) || (snakeIndex != -1 && snakeIndex != snake.size() - 1)) {
             isDie = true;
-
+            snakeHead = snakeUpFaceDeath;
         }
         else if ((snake.get(0)).y == 0) {
             isDie = true;
+            snakeHead = snakeUpFaceDeath;
         }
         else {
             (snake.get(0)).y -= cellSize;
@@ -166,11 +203,13 @@ public class SnakeApplication extends JFrame{
     void turnDown() {
         int foodIndex = searchingFoodByCoordinates(snake.get(0).x, snake.get(0).y + cellSize);
         int snakeIndex = searchingSnakeByCoordinates(snake.get(0).x, snake.get(0).y + cellSize);
-        if ((foodIndex != -1 && !food.get(foodIndex).isGood) || snakeIndex != -1) {
+        if ((foodIndex != -1 && !food.get(foodIndex).isGood) || (snakeIndex != -1 && snakeIndex != snake.size() - 1)) {
             isDie = true;
+            snakeHead = snakeDownFaceDeath;
         }
         else if ((snake.get(0)).y == 7 * cellSize) {
             isDie = true;
+            snakeHead = snakeDownFaceDeath;
         }
         else {
             (snake.get(0)).y += cellSize;
@@ -236,9 +275,9 @@ public class SnakeApplication extends JFrame{
         boolean foodWasAdded = false;
         long lastElementValue = snake.get(snake.size() - 1).value == 0 ? 1 : snake.get(snake.size() - 1).value;
         long lastElementPower = (long)(Math.log(lastElementValue) / Math.log(2));
-        double maxPower = lastElementPower + 5;
-        double minPower = lastElementPower - 30;
-        int power = lastElementPower > 30? (int) (minPower + (Math.random() * maxPower)) : (int)(Math.random() * maxPower);
+        double maxPower = lastElementPower + 4;
+        double minPower = lastElementPower - 15;
+        int power = lastElementPower > 15? (int) (minPower + (Math.random() * maxPower)) : (int)(Math.random() * maxPower);
         long value = (long)(Math.pow(2, power));
         int x_prohibited = snake.get(0).x;
         int y_prohibited = snake.get(0).y;
@@ -354,9 +393,6 @@ public class SnakeApplication extends JFrame{
         return false;
     }
 
-    void die() {
-
-    }
 
 //    formatting value to String
     String formatValue(long value) {
@@ -378,6 +414,17 @@ public class SnakeApplication extends JFrame{
         }
         else {
             return (long)(value / tb) + "T";
+        }
+    }
+
+    int setMarginForLetters(String s) {
+        switch (s.length()) {
+            case 1: return 40;
+            case 2: return 30;
+            case 3: return 20;
+            case 4: return 12;
+            case 5:return 5;
+            default: return 0;
         }
     }
 
@@ -445,19 +492,19 @@ public class SnakeApplication extends JFrame{
 
             moving();
             checkFood();
-            if (isDie) {
-                timer.stop();
-                System.out.println(score);
-            }
-
-
-                g.setFont(new Font("Tahoma", Font.BOLD, 30));
-                g.drawImage(snakeHead, (snake.get(0)).x, (snake.get(0)).y, this);
-                for (int i = 1; i < snake.size(); i++) {
-                    g.drawImage(snakeBody, (snake.get(i)).x, (snake.get(i)).y, this);
-                    g.drawString((formatValue(snake.get(i).value)), snake.get(i).x + 30, snake.get(i).y + 50);
+//            g.setColor(Color.DARK_GRAY);
+            g.drawImage(snakeHead, (snake.get(0)).x, (snake.get(0)).y, this);
+            for (int i = 1; i < snake.size(); i++) {
+                String formatString = formatValue(snake.get(i).value);
+                if (formatString.length() > 4) {
+                    g.setFont(new Font("Tahoma", Font.BOLD, 25));
                 }
-
+                else {
+                    g.setFont(new Font("Tahoma", Font.BOLD, 30));
+                }
+                g.drawImage(snakeBody, (snake.get(i)).x, (snake.get(i)).y, this);
+                g.drawString(formatString, snake.get(i).x + setMarginForLetters(formatString), snake.get(i).y + 60);
+            }
 
             if (food.size() > 0) {
                 for (int i = 0; i < food.size(); i++) {
@@ -465,10 +512,30 @@ public class SnakeApplication extends JFrame{
                     if (food.get(i).isGood ) {
                         image = goodFood;
                     }
+                    String formatString = formatValue(food.get(i).value);
+                    if (formatString.length() > 4) {
+                        g.setFont(new Font("Tahoma", Font.BOLD, 27));
+                    }
+                    else {
+                        g.setFont(new Font("Tahoma", Font.BOLD, 30));
+                    }
                     g.drawImage(image, food.get(i).x, food.get(i).y, this);
-                    g.drawString((formatValue(food.get(i).value)), food.get(i).x + 15, food.get(i).y + 60);
+                    g.drawString(formatString, food.get(i).x + setMarginForLetters(formatString), food.get(i).y + 60);
                 }
             }
+
+            if (isDie) {
+                timer.stop();
+                g.setColor(new Color(250, 250, 250));
+                g.drawImage(gameOverBG, 80, 300, this);
+//                g.fillRect(70, 300, 460, 210);
+                g.setFont(new Font("Tahoma", Font.BOLD, 80));
+                g.setColor(new Color(70, 70, 70));
+                g.drawString("Game over", getWidth() / 2 - 210, getHeight() / 2);
+                g.setFont(new Font("Tahoma", Font.BOLD, 50));
+                g.drawString("score: " + score, getWidth() / 2 - 100, getHeight() / 2 + 60);
+            }
+            jtfScore.setText(score + "");
 
         }
     }
