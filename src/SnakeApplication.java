@@ -86,8 +86,7 @@ public class SnakeApplication extends JApplet{
         jbtNewGame.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-//                System.out.println("was clicked");
-                    
+                restartSnake();
             }
         });
     }
@@ -103,6 +102,21 @@ public class SnakeApplication extends JApplet{
     }
 
 //    Search and add similar value inside snake
+    void restartSnake() {
+
+            setFocusable(true);
+        requestFocus();
+            isDie = false;
+            stepsCount = 0;
+            score = 0;
+            snake.clear();
+            oldSnake.clear();
+        food.clear();
+        snake.add(new Snake());
+        direction = 'r';
+        snakeHead = snakeRightFace;
+        timer.restart();
+    }
     void compactSnake() {
         for (int i = 1; i < snake.size() - 1; i++) {
             if (snake.get(i).value == snake.get(i + 1).value) {
