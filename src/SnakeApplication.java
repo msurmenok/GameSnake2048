@@ -11,7 +11,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class SnakeApplication extends JApplet{
+public class SnakeApplication extends JFrame{
     Timer timer = new Timer(600, new TimerListener());
     String gameStyle = "normal";
 
@@ -91,15 +91,17 @@ public class SnakeApplication extends JApplet{
         });
     }
 
-
-    public void start() {
-//        JFrame game = new SnakeApplication();
-//        game.setSize(870, 839);
-//        game.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//        game.setLocationRelativeTo(null);
-//        game.setVisible(true);
-
+    public static void main(String[] args) {
+        JFrame game = new SnakeApplication();
+        game.setSize(870, 839);
+        game.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        game.setLocationRelativeTo(null);
+        game.setVisible(true);
     }
+//    public void start() {
+
+
+//    }
 
 //    Search and add similar value inside snake
     void restartSnake() {
@@ -175,10 +177,10 @@ public class SnakeApplication extends JApplet{
         if (stepsCount == 0) {
             addFood(1);
         }
-        else if (stepsCount % 2 == 0 && stepsCount != 0 && food.size() <= 15) {
+        else if (stepsCount % 2 == 0 && stepsCount != 0 && food.size() <= 15 && (snake.size() + food.size()) < 48) {
             addFood();
         }
-        else if (stepsCount % 4 == 0 && stepsCount != 0 && food.size() > 15) {
+        else if (stepsCount % 4 == 0 && stepsCount != 0 && food.size() > 15 && (snake.size() + food.size()) < 48) {
             addFood();
         }
         if (stepsCount % 30 == 0 && stepsCount != 0) {
