@@ -11,25 +11,25 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class SnakeApplication extends JFrame{
+public class SnakeApplication extends JApplet{
     Timer timer = new Timer(600, new TimerListener());
     String gameStyle = "normal";
 
-    Image background = (new ImageIcon("images/bg.png")).getImage();
-    Image snakeRightFace= (new ImageIcon("images/rightFace.png")).getImage();
-    Image snakeLeftFace= (new ImageIcon("images/leftFace.png")).getImage();
-    Image snakeUpFace= (new ImageIcon("images/upFace.png")).getImage();
-    Image snakeDownFace= (new ImageIcon("images/downFace.png")).getImage();
-    Image snakeRightFaceDeath= (new ImageIcon("images/rightFaceDeath.png")).getImage();
-    Image snakeLeftFaceDeath= (new ImageIcon("images/leftFaceDeath.png")).getImage();
-    Image snakeUpFaceDeath= (new ImageIcon("images/upFaceDeath.png")).getImage();
-    Image snakeDownFaceDeath= (new ImageIcon("images/downFaceDeath.png")).getImage();
+    Image background = (new ImageIcon(this.getClass().getResource("images/bg.png"))).getImage();
+    Image snakeRightFace= (new ImageIcon(this.getClass().getResource("images/rightFace.png"))).getImage();
+    Image snakeLeftFace= (new ImageIcon(this.getClass().getResource("images/leftFace.png"))).getImage();
+    Image snakeUpFace= (new ImageIcon(this.getClass().getResource("images/upFace.png"))).getImage();
+    Image snakeDownFace= (new ImageIcon(this.getClass().getResource("images/downFace.png"))).getImage();
+    Image snakeRightFaceDeath= (new ImageIcon(this.getClass().getResource("images/rightFaceDeath.png"))).getImage();
+    Image snakeLeftFaceDeath= (new ImageIcon(this.getClass().getResource("images/leftFaceDeath.png"))).getImage();
+    Image snakeUpFaceDeath= (new ImageIcon(this.getClass().getResource("images/upFaceDeath.png"))).getImage();
+    Image snakeDownFaceDeath= (new ImageIcon(this.getClass().getResource("images/downFaceDeath.png"))).getImage();
     Image snakeHead = snakeRightFace;
-    Image snakeBody = (new ImageIcon("images/snakeBody.png")).getImage();
-    Image goodFood = (new ImageIcon("images/food.png")).getImage();
-    Image badFood = (new ImageIcon("images/poison.png")).getImage();
+    Image snakeBody = (new ImageIcon(this.getClass().getResource("images/snakeBody.png"))).getImage();
+    Image goodFood = (new ImageIcon(this.getClass().getResource("images/food.png"))).getImage();
+    Image badFood = (new ImageIcon(this.getClass().getResource("images/poison.png"))).getImage();
 
-    Image gameOverBG = (new ImageIcon("images/gameOverBG.png")).getImage();
+    Image gameOverBG = (new ImageIcon(this.getClass().getResource("images/gameOverBG.png"))).getImage();
 
     boolean isDie = false;
     char direction = 'r';
@@ -46,6 +46,26 @@ public class SnakeApplication extends JFrame{
 
 
     public SnakeApplication() {
+        addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                switch (e.getKeyCode()) {
+                    case KeyEvent.VK_LEFT:
+                        setDirection('l');
+                        break;
+                    case KeyEvent.VK_RIGHT:
+                        setDirection('r');
+                        break;
+                    case KeyEvent.VK_UP:
+                        setDirection('u');
+                        break;
+                    case KeyEvent.VK_DOWN:
+                        setDirection('d');
+                        break;
+                }
+            }
+        });
+        setFocusable(true);
         snake.add(new Snake());
 
         DrawingSnake panel = new DrawingSnake();
@@ -66,18 +86,20 @@ public class SnakeApplication extends JFrame{
         jbtNewGame.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+//                System.out.println("was clicked");
+                    
             }
         });
     }
 
 
-    public static void main(String[] args) {
-        JFrame game = new SnakeApplication();
-        game.setSize(870, 839);
-        game.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        game.setLocationRelativeTo(null);
-        game.setVisible(true);
+    public void start() {
+//        JFrame game = new SnakeApplication();
+//        game.setSize(870, 839);
+//        game.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//        game.setLocationRelativeTo(null);
+//        game.setVisible(true);
+
     }
 
 //    Search and add similar value inside snake
@@ -467,17 +489,7 @@ public class SnakeApplication extends JFrame{
          DrawingSnake() {
              timer.start();
 
-             addKeyListener(new KeyAdapter() {
-                 @Override
-                 public void keyPressed(KeyEvent e) {
-                     switch (e.getKeyCode()) {
-                         case KeyEvent.VK_LEFT: setDirection('l'); break;
-                         case KeyEvent.VK_RIGHT: setDirection('r'); break;
-                         case KeyEvent.VK_UP: setDirection('u'); break;
-                         case KeyEvent.VK_DOWN: setDirection('d'); break;
-                     }
-                 }
-             });
+
 
          }
 
@@ -488,10 +500,9 @@ public class SnakeApplication extends JFrame{
             g.drawImage(background, 0, 0, this);
 
 
-            this.setFocusable(true);
+//            this.setFocusable(true);
 
-            moving();
-            checkFood();
+
 //            g.setColor(Color.DARK_GRAY);
             g.drawImage(snakeHead, (snake.get(0)).x, (snake.get(0)).y, this);
             for (int i = 1; i < snake.size(); i++) {
@@ -527,13 +538,13 @@ public class SnakeApplication extends JFrame{
             if (isDie) {
                 timer.stop();
                 g.setColor(new Color(250, 250, 250));
-                g.drawImage(gameOverBG, 80, 300, this);
+                g.drawImage(gameOverBG, 80, 370, this);
 //                g.fillRect(70, 300, 460, 210);
                 g.setFont(new Font("Tahoma", Font.BOLD, 80));
                 g.setColor(new Color(70, 70, 70));
-                g.drawString("Game over", getWidth() / 2 - 210, getHeight() / 2);
+                g.drawString("Game over", 90, 470);
                 g.setFont(new Font("Tahoma", Font.BOLD, 50));
-                g.drawString("score: " + score, getWidth() / 2 - 100, getHeight() / 2 + 60);
+                g.drawString("score: " + score, 200, 550);
             }
             jtfScore.setText(score + "");
 
@@ -544,6 +555,8 @@ public class SnakeApplication extends JFrame{
     class TimerListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent arg0) {
+            moving();
+            checkFood();
             repaint();
         }
     }
